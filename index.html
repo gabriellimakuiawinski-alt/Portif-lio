@@ -429,7 +429,7 @@
     <nav class="nav" aria-label="Seções">
       <a href="#projetos">Projetos</a>
       <a href="#servicos">Serviços</a>
-      <a class="cta gbtn light" data-cur="red" href="#contato">Contato</a>
+      <a class="cta gbtn light" href="#contato">Contato</a>
     </nav>
   </div>
 </header>
@@ -440,7 +440,7 @@
 </div>
 
 <div class="player" id="player">
-  <div class="pl-mini" data-cur="red">
+  <div class="pl-mini">
     <button class="pl-btn pl-quick" id="plQuick" type="button" aria-label="Tocar música"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 3.5l11 6.5-11 6.5z"/></svg></button>
     <button class="pl-btn pl-open" id="plOpen" type="button" aria-expanded="false" aria-controls="plPanel">
       <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
@@ -448,7 +448,7 @@
       <svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2"/></svg>
     </button>
   </div>
-  <div class="pl-panel" id="plPanel" data-cur="cream" hidden>
+  <div class="pl-panel" id="plPanel" hidden>
     <div class="pl-head">
       <span class="pl-k" id="plK">Pausado</span>
       <button class="pl-btn pl-min" id="plMin" type="button">Diminuir <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 5h8v2H2z"/></svg></button>
@@ -546,7 +546,7 @@
             <li>Contato por WhatsApp</li>
             <li>Atendimento somente com hora marcada</li>
           </ul>
-          <a class="visit gbtn mag" data-cur="cream" href="https://claude.ai/artifact/QRnsr5H6UApCFEfzonxhGN" target="_blank" rel="noopener"><span>Abrir o site</span><i class="ar" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3 13L13 3M5 3h8v8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></i></a>
+          <a class="visit gbtn mag" href="https://claude.ai/artifact/QRnsr5H6UApCFEfzonxhGN" target="_blank" rel="noopener"><span>Abrir o site</span><i class="ar" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3 13L13 3M5 3h8v8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></i></a>
         </div>
       </article>
 
@@ -568,7 +568,7 @@
             <li>Tokens que se movem e imagens enviadas pelos jogadores</li>
             <li>Fichas e mesas no Supabase, publicado no GitHub Pages</li>
           </ul>
-          <a class="visit gbtn mag" data-cur="cream" href="https://gabriellimakuiawinski-alt.github.io/Open-Rpg/" target="_blank" rel="noopener"><span>Abrir o site</span><i class="ar" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3 13L13 3M5 3h8v8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></i></a>
+          <a class="visit gbtn mag" href="https://gabriellimakuiawinski-alt.github.io/Open-Rpg/" target="_blank" rel="noopener"><span>Abrir o site</span><i class="ar" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3 13L13 3M5 3h8v8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></i></a>
         </div>
       </article>
     </div>
@@ -740,46 +740,69 @@
   var follow = [1, .42, .27, .17], dr = [13, 10, 7.5, 5.5];
   var touchTimer = 0;
 
-  /* cores do cursor: vermelho sobre o creme, creme sobre o vermelho, e uma mistura na fronteira */
-  var COL = { red: [179, 39, 28], cream: [241, 236, 223], white: [255, 253, 250], ink: [28, 18, 16] };
-  var zones = [], barH = 64, scrollY = 0;
-  var ov = { col: COL.cream, amt: 0, on: false };
+  /* cor do cursor: lê a cor real do que está por baixo (fundos, botões, recortes) e fica na cor oposta.
+     Sobre fundo claro vira vermelho, sobre fundo escuro ou vermelho vira creme; na fronteira divide. */
+  var RED = [179, 39, 28], CREAM = [241, 236, 223];
+  var bgCache = typeof WeakMap === 'function' ? new WeakMap() : null;
+  function lumOf(r, g, b) { return .2126 * Math.pow(r / 255, 2.2) + .7152 * Math.pow(g / 255, 2.2) + .0722 * Math.pow(b / 255, 2.2); }
+  function darkOf(l) { return 1 - sm((l - .18) / .14); }
   function sm(t) { t = clamp(t, 0, 1); return t * t * (3 - 2 * t); }
-  function measureZones() {
-    var y = window.pageYOffset || 0, wv = $('.wave'), hh = wv ? wv.getBoundingClientRect().height / 2 : 14;
-    zones = $$('.band.red').map(function (b) { var r = b.getBoundingClientRect(); return [r.top + y + hh, r.bottom + y + hh]; });
-    barH = bar.offsetHeight || 64;
-  }
-  function redness(vy) {
-    if (!introDone) return 1;
-    var v = 1 - sm((vy - barH + 3) / 6), py = vy + scrollY;
-    for (var i = 0; i < zones.length; i++) {
-      var a = sm((py - zones[i][0] + 3) / 6) * (1 - sm((py - zones[i][1] + 3) / 6));
-      if (a > v) v = a;
+  function bgLum(n) {
+    var cs = getComputedStyle(n), m = /rgba?\(([^)]+)\)/.exec(cs.backgroundColor);
+    if (m) {
+      var v = m[1].split(','), a = v.length > 3 ? parseFloat(v[3]) : 1;
+      if (a > .5) return lumOf(+v[0], +v[1], +v[2]);
     }
-    return v;
-  }
-  function colAt(vy) {
-    var k = redness(vy), a = COL.red, b = COL.cream, o = ov.col, m = ov.amt;
-    var r = lerp(a[0], b[0], k), g = lerp(a[1], b[1], k), bl = lerp(a[2], b[2], k);
-    return [Math.round(lerp(r, o[0], m)), Math.round(lerp(g, o[1], m)), Math.round(lerp(bl, o[2], m))];
-  }
-  function rgb(c) { return 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')'; }
-  function paintDot(i) {
-    var y = bp[i].y, r = dr[i], cs = [], k, same = true;
-    for (k = 0; k < 5; k++) {
-      cs.push(colAt(y + (k - 2) * r * .5));
-      if (k && (Math.abs(cs[k][0] - cs[0][0]) > 2 || Math.abs(cs[k][1] - cs[0][1]) > 2 || Math.abs(cs[k][2] - cs[0][2]) > 2)) same = false;
+    if (cs.backgroundImage && cs.backgroundImage.indexOf('gradient') > -1) {
+      var g = /rgba?\(([^)]+)\)/.exec(cs.backgroundImage);
+      if (g) { var w = g[1].split(','); return lumOf(+w[0], +w[1], +w[2]); }
     }
-    var bg = same ? rgb(cs[2]) : 'linear-gradient(180deg,' + cs.map(function (c, n) { return rgb(c) + ' ' + (n * 25) + '%'; }).join(',') + ')';
-    if (dots[i]._bg !== bg) { dots[i]._bg = bg; dots[i].style.background = bg; }
+    return -1;
   }
-  document.addEventListener('pointerover', function (e) {
-    if (e.pointerType === 'touch') return;
-    var t = e.target && e.target.closest ? e.target.closest('[data-cur]') : null;
-    ov.on = !!t;
-    if (t) ov.col = COL[t.getAttribute('data-cur')] || COL.cream;
-  }, { passive: true });
+  function darkAt(x, y, last) {
+    var el = document.elementFromPoint(x, y);
+    if (!el) return last;
+    if (root.classList.contains('intro') || root.classList.contains('gating')) return el.id === 'gateGo' ? 0 : 1;
+    if (el.closest) {
+      if (el.closest('.gbtn:hover')) return 1;
+      if (el.closest('.svc:hover')) return 0;
+    }
+    var now = performance.now(), n = el, hops = 0;
+    while (n && n.nodeType === 1 && hops++ < 16) {
+      var c = bgCache ? bgCache.get(n) : null;
+      if (!c || now - c.t > 140) { c = { t: now, l: bgLum(n) }; if (bgCache) bgCache.set(n, c); }
+      if (c.l >= 0) return darkOf(c.l);
+      n = n.parentElement;
+    }
+    return 0;
+  }
+  function mixCol(d) {
+    return 'rgb(' + Math.round(lerp(RED[0], CREAM[0], d)) + ',' + Math.round(lerp(RED[1], CREAM[1], d)) + ',' + Math.round(lerp(RED[2], CREAM[2], d)) + ')';
+  }
+  var dk = dots.map(function () { return [0, 0, 0, 0, 0]; });   /* centro, cima, baixo, esquerda, direita */
+  var sTick = 0;
+  function sampleDots() {
+    for (var i = 0; i < dots.length; i++) {
+      var x = bp[i].x, y = bp[i].y, r = dr[i] + 2, d = dk[i], t;
+      if (i === 0) {
+        t = [darkAt(x, y, d[0]), darkAt(x, y - r, d[1]), darkAt(x, y + r, d[2]), darkAt(x - r, y, d[3]), darkAt(x + r, y, d[4])];
+      } else {
+        var c = darkAt(x, y, d[0]); t = [c, c, c, c, c];
+      }
+      for (var k = 0; k < 5; k++) d[k] = lerp(d[k], t[k], .45);
+    }
+  }
+  function paintDots() {
+    for (var i = 0; i < dots.length; i++) {
+      var d = dk[i], bg;
+      var dv = Math.abs(d[1] - d[2]), dh = Math.abs(d[3] - d[4]);
+      if (i > 0 || Math.max(dv, dh) < .06) bg = mixCol(d[0]);
+      else if (dv >= dh) bg = 'linear-gradient(180deg,' + mixCol(d[1]) + ' 0%,' + mixCol(d[0]) + ' 50%,' + mixCol(d[2]) + ' 100%)';
+      else bg = 'linear-gradient(90deg,' + mixCol(d[3]) + ' 0%,' + mixCol(d[0]) + ' 50%,' + mixCol(d[4]) + ' 100%)';
+      if (dots[i]._bg !== bg) { dots[i]._bg = bg; dots[i].style.background = bg; }
+    }
+  }
+  function measureZones() {}
 
   window.addEventListener('pointermove', function (e) {
     var first = !ptr.in;
@@ -806,15 +829,13 @@
   function updateBlob() {
     if (!blob || !fine || reduce || !ptr.in) return;
     blob.style.transform = 'translate(' + ptr.x.toFixed(1) + 'px,' + ptr.y.toFixed(1) + 'px)';
-    ov.amt = lerp(ov.amt, ov.on ? 1 : 0, .13);
-    if (Math.abs(ov.amt - (ov.on ? 1 : 0)) < .005) ov.amt = ov.on ? 1 : 0;
     for (var i = 0; i < dots.length; i++) {
       bp[i].x = lerp(bp[i].x, ptr.x, follow[i]);
       bp[i].y = lerp(bp[i].y, ptr.y, follow[i]);
       var ox = clamp(bp[i].x - ptr.x, -58, 58), oy = clamp(bp[i].y - ptr.y, -58, 58);
       dots[i].style.transform = 'translate(' + ox.toFixed(1) + 'px,' + oy.toFixed(1) + 'px)';
-      paintDot(i);
     }
+    if ((sTick++ % 2) === 0) { sampleDots(); paintDots(); }
   }
 
   /* palavra "Portfólio": as letras fogem do ponteiro e voltam como mola */
