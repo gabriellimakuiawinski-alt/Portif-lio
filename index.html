@@ -169,7 +169,7 @@
   @keyframes tape { to { background-position-x: 2em; } }
   .cb-valve { position: absolute; right: 3em; top: 2.6em; width: 7.2em; height: 7.2em; filter: drop-shadow(0 .4em .5em rgba(0, 0, 0, .6)); }
   .cb-valve svg { display: block; width: 100%; height: 100%; overflow: visible; }
-  .vg { transform-box: view-box; transform-origin: 50% 50%; transition: transform .35s var(--ease); }
+  .vg { transform-box: view-box; }
   .cb-copy { position: absolute; left: 2.4em; top: 3.4em; width: 18.6em; }
   .cb-eye { margin: 0 0 .9em; font: 400 .85em/1.4 var(--f-mono); letter-spacing: .18em; text-transform: uppercase; color: var(--b-muted); }
   .cb-h { margin: 0; font: 900 2.55em/.95 var(--f-stencil); text-transform: uppercase; letter-spacing: .005em; }
@@ -829,7 +829,7 @@
       var x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
       el.style.transform = 'perspective(900px) rotateY(' + (x * 12).toFixed(2) + 'deg) rotateX(' + (-y * 10).toFixed(2) + 'deg) scale(1.02)';
       var vg = $('.vg', el);
-      if (vg) vg.style.transform = 'rotate(' + (x * 620).toFixed(0) + 'deg)';
+      if (vg) { vg._t = x * 620; if (!vg._on) { vg._on = true; vg._a = vg._a || 0; (function spin() { vg._a += (vg._t - vg._a) * .16; vg.setAttribute('transform', 'rotate(' + vg._a.toFixed(2) + ')'); if (Math.abs(vg._t - vg._a) > .05) requestAnimationFrame(spin); else vg._on = false; })(); } }
     });
     el.addEventListener('pointerleave', function () { el.style.transform = ''; });
     el.addEventListener('pointerenter', function (e) { if (e.pointerType !== 'touch') sfx('bloop', .65); });
