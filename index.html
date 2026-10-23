@@ -746,7 +746,7 @@
   var ov = { col: COL.cream, amt: 0, on: false };
   function sm(t) { t = clamp(t, 0, 1); return t * t * (3 - 2 * t); }
   function measureZones() {
-    var y = window.pageYOffset || 0, wv = $('.wave'), hh = wv ? wv.offsetHeight / 2 : 14;
+    var y = window.pageYOffset || 0, wv = $('.wave'), hh = wv ? wv.getBoundingClientRect().height / 2 : 14;
     zones = $$('.band.red').map(function (b) { var r = b.getBoundingClientRect(); return [r.top + y + hh, r.bottom + y + hh]; });
     barH = bar.offsetHeight || 64;
   }
