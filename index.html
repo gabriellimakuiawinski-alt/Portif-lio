@@ -82,8 +82,8 @@
 
   /* ===== Barra do topo e abertura ===== */
   .bar { position: fixed; inset: 0 0 auto 0; height: var(--bar); z-index: 100; pointer-events: none; }
-  .veil { position: fixed; inset: 0; z-index: 0; background: var(--red); clip-path: inset(0 0 calc(100% - var(--bar)) 0); }
-  html.intro .veil { clip-path: none; }
+  .veil { position: fixed; left: 0; right: 0; top: 0; height: var(--bar); z-index: 0; background: var(--red); }
+  html.intro .veil { height: 100%; bottom: 0; }
   .bar .box { height: 100%; padding-top: env(safe-area-inset-top, 0px); display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
   .brand { margin: 0; display: block; transform-origin: 0 0; pointer-events: auto; font: 400 clamp(1.2rem, 3.8vw, 1.65rem)/.86 var(--f-fat); color: var(--white); letter-spacing: -.015em; }
   .brand a { display: block; text-decoration: none; color: inherit; }
@@ -114,7 +114,7 @@
 
   /* ===== Entrada fluida ===== */
   html.js:not(.static) .flow:not(.on) { opacity: 0; transform: translateY(46px) scale(.92) rotate(-1.6deg); clip-path: circle(0% at var(--ox, 30%) var(--oy, 100%)); }
-  html.js:not(.static) .flow { transition: opacity .45s ease var(--dl, 0s), transform 1.25s var(--spring2) var(--dl, 0s), clip-path 1.15s var(--ease) var(--dl, 0s); }
+  html.js:not(.static) .flow { transition: opacity .45s ease var(--dl, 0s), transform 1.25s var(--spring2) var(--dl, 0s), clip-path .95s var(--ease) var(--dl, 0s); }
   html.js:not(.static) .flow.on { opacity: 1; transform: none; clip-path: circle(150% at var(--ox, 30%) var(--oy, 100%)); }
   html.js:not(.static) .flow.done { transition: none; clip-path: none; }
   html.failsafe .flow { opacity: 1 !important; transform: none !important; clip-path: none !important; }
@@ -133,8 +133,6 @@
   .pos { position: absolute; }
   .pos.c1 { left: 1%; top: 6%; width: 49%; rotate: -4deg; z-index: 1; animation: bob 6.2s ease-in-out infinite; }
   .pos.c2 { right: 1%; top: 14%; width: 47%; rotate: 3.5deg; z-index: 2; animation: bob 7.1s ease-in-out -2s infinite; }
-  .pos.c1 .cut { translate: calc(var(--px, 0) * -16px) calc(var(--py, 0) * -10px); }
-  .pos.c2 .cut { translate: calc(var(--px, 0) * 20px) calc(var(--py, 0) * 12px); }
   @keyframes bob { 0%, 100% { translate: 0 0; } 50% { translate: 0 -7px; } }
   .cursor { position: absolute; z-index: 4; left: 47%; top: 52%; width: clamp(38px, 7vw, 66px); aspect-ratio: 1; rotate: -8deg; animation: bob 4.6s ease-in-out -1s infinite; }
   .halftone { position: absolute; z-index: 0; left: 30%; top: -14%; width: 42%; aspect-ratio: 1; border-radius: 50%; background-image: radial-gradient(var(--red) 1.6px, transparent 2.1px); background-size: 10px 10px; opacity: .55; }
@@ -212,7 +210,7 @@
   .cr-hero { position: absolute; left: 2.2em; right: 2.2em; top: 12.4em; padding: 1.9em 1.6em 1.6em; border-radius: .3em 1em .8em .8em; background: linear-gradient(180deg, #e2c98e 0, #c9aa68 100%); box-shadow: 0 .1em 0 rgba(0, 0, 0, .2), 0 1.8em 2.4em -1.4em #000; rotate: -.5deg; transition: rotate .35s var(--spring), translate .35s var(--spring); color: var(--r-ink); }
   .cr-hero::before { content: ""; position: absolute; left: 1em; right: 2em; top: -.65em; height: 1.6em; background: var(--r-paper2); rotate: .7deg; z-index: -1; box-shadow: 0 -.08em .2em rgba(0, 0, 0, .2); }
   .cr-hero:hover { rotate: 0deg; translate: 0 -.4em; }
-  .cr-etq { display: inline-block; font: 400 .85em/1 var(--f-maq); letter-spacing: .14em; text-transform: uppercase; color: var(--r-stamp); border: .15em solid currentColor; border-radius: .3em; padding: .4em .6em .3em; rotate: -3deg; mix-blend-mode: multiply; }
+  .cr-etq { display: inline-block; font: 400 .85em/1 var(--f-maq); letter-spacing: .14em; text-transform: uppercase; color: var(--r-stamp); border: .15em solid currentColor; border-radius: .3em; padding: .4em .6em .3em; rotate: -3deg; }
   .cr-hero h5 { margin: .6em 0 0; font: 400 2.3em/1.05 var(--f-maq); }
   .cr-meta { margin-top: .3em; font: 700 1.65em/1.05 var(--f-caveat); color: var(--r-pen); rotate: -1.5deg; transform-origin: left; }
   .cr-btn { position: relative; overflow: hidden; display: inline-block; margin-top: 1em; padding: .95em 1.5em .85em; border-radius: .3em; background: var(--r-stamp); color: var(--r-paper2); font: 400 1em/1 var(--f-maq); letter-spacing: .12em; text-transform: uppercase; box-shadow: 0 .35em 0 var(--r-stamp-dk), inset 0 0 0 .13em rgba(255, 255, 255, .13); rotate: -.6deg; transition: translate .18s var(--spring), box-shadow .18s, background .2s; user-select: none; }
@@ -312,12 +310,12 @@
   .pl-btn .chev { width: 12px; height: 12px; transition: rotate .4s var(--spring); }
   .player.open .chev { rotate: 180deg; }
   .eq { display: inline-flex; align-items: flex-end; gap: 2px; height: 14px; }
-  .eq i { width: 3.5px; height: 35%; border-radius: 3px; background: var(--red); }
+  .eq i { width: 3.5px; height: 100%; border-radius: 3px; background: var(--red); transform-origin: 50% 100%; transform: scaleY(.35); }
   .player.playing .eq i { animation: eq .8s ease-in-out infinite alternate; }
   .player.playing .eq i:nth-child(2) { animation-delay: -.3s; animation-duration: .65s; }
   .player.playing .eq i:nth-child(3) { animation-delay: -.5s; animation-duration: .9s; }
   .player.playing .eq i:nth-child(4) { animation-delay: -.15s; animation-duration: .7s; }
-  @keyframes eq { from { height: 20%; } to { height: 100%; } }
+  @keyframes eq { from { transform: scaleY(.2); } to { transform: scaleY(1); } }
   .pl-panel { position: absolute; top: calc(100% + 10px); left: 50%; width: min(330px, calc(100vw - 32px)); margin-left: calc(min(330px, calc(100vw - 32px)) / -2); padding: 1.25rem 1.35rem 1.4rem; background: #8E1E15; color: var(--cream); border-radius: 40px 30px 44px 28px / 30px 42px 28px 40px; box-shadow: 0 26px 44px -20px rgba(40, 6, 2, .8); overflow: hidden; transform-origin: 50% 0; animation: plIn .55s var(--spring); }
   .pl-panel::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at 92% 6%, rgba(255, 255, 255, .13) 0 36px, transparent 37px), radial-gradient(circle at 80% 20%, rgba(255, 255, 255, .09) 0 13px, transparent 14px), radial-gradient(circle at 4% 104%, rgba(255, 255, 255, .08) 0 70px, transparent 71px); }
   .pl-panel > * { position: relative; }
@@ -828,6 +826,10 @@
 
   function updateBlob() {
     if (!blob || !fine || reduce || !ptr.in) return;
+    var still = ptr.x === blobLast.x && ptr.y === blobLast.y;
+    for (var j = 0; still && j < dots.length; j++) if (Math.abs(bp[j].x - ptr.x) > .1 || Math.abs(bp[j].y - ptr.y) > .1) still = false;
+    if (still) { if (sampled) { sampled = false; paintDots(); } return; }
+    blobLast.x = ptr.x; blobLast.y = ptr.y;
     blob.style.transform = 'translate(' + ptr.x.toFixed(1) + 'px,' + ptr.y.toFixed(1) + 'px)';
     for (var i = 0; i < dots.length; i++) {
       bp[i].x = lerp(bp[i].x, ptr.x, follow[i]);
@@ -835,13 +837,19 @@
       var ox = clamp(bp[i].x - ptr.x, -58, 58), oy = clamp(bp[i].y - ptr.y, -58, 58);
       dots[i].style.transform = 'translate(' + ox.toFixed(1) + 'px,' + oy.toFixed(1) + 'px)';
     }
-    if ((sTick++ % 2) === 0) { sampleDots(); paintDots(); }
+    if (sampled) { sampled = false; paintDots(); }
+  }
+  var sampled = false, blobLast = { x: -1, y: -1 };
+  function readBlob() {
+    if (!blob || !fine || reduce || !ptr.in) return;
+    if ((sTick++ % 3) === 0) { sampleDots(); sampled = true; }
   }
 
   /* palavra "Portfólio": as letras fogem do ponteiro e voltam como mola */
   function updateLetters() {
     if (reduce || !mega || !letters.length) return;
-    var c = mega.getBoundingClientRect();
+    if (!G.mega) return;
+    var ct = G.mega.top - scrollY, c = { left: G.mega.left, top: ct, bottom: ct + G.mega.h };
     if (c.bottom < -200 || c.top > innerHeight + 200) return;
     var fs = parseFloat(mega.style.getPropertyValue('--mega')) || 100;
     var R = fs * 1.15, F = fs * .3;
@@ -874,18 +882,20 @@
 
   /* colagem do topo se desloca em camadas */
   var collage = $('.collage'), cp = { x: 0, y: 0, lx: 9, ly: 9 };
+  var cutA = $('.pos.c1 .cut'), cutB = $('.pos.c2 .cut');
   function updateCollage() {
-    if (reduce || !collage) return;
-    var r = collage.getBoundingClientRect(), tx = 0, ty = 0;
-    if (ptr.in && r.bottom > 0 && r.top < innerHeight) {
-      tx = clamp((ptr.x - (r.left + r.width / 2)) / (innerWidth / 2), -1, 1);
-      ty = clamp((ptr.y - (r.top + r.height / 2)) / (innerHeight / 2), -1, 1);
+    if (reduce || !collage || !G.collage) return;
+    var g = G.collage, top = g.top - scrollY, tx = 0, ty = 0;
+    if (top + g.h < 0 || top > innerHeight) return;
+    if (ptr.in) {
+      tx = clamp((ptr.x - (g.left + g.w / 2)) / (innerWidth / 2), -1, 1);
+      ty = clamp((ptr.y - (top + g.h / 2)) / (innerHeight / 2), -1, 1);
     }
     cp.x = lerp(cp.x, tx, .07); cp.y = lerp(cp.y, ty, .07);
-    if (Math.abs(cp.x - cp.lx) > .001 || Math.abs(cp.y - cp.ly) > .001) {
+    if (Math.abs(cp.x - cp.lx) > .002 || Math.abs(cp.y - cp.ly) > .002) {
       cp.lx = cp.x; cp.ly = cp.y;
-      collage.style.setProperty('--px', cp.x.toFixed(3));
-      collage.style.setProperty('--py', cp.y.toFixed(3));
+      if (cutA) cutA.style.translate = (cp.x * -16).toFixed(1) + 'px ' + (cp.y * -10).toFixed(1) + 'px';
+      if (cutB) cutB.style.translate = (cp.x * 20).toFixed(1) + 'px ' + (cp.y * 12).toFixed(1) + 'px';
     }
   }
 
@@ -894,12 +904,14 @@
   function updateMags() {
     if (reduce) return;
     mags.forEach(function (M) {
-      var r = M.el.getBoundingClientRect();
-      if (r.bottom < 0 || r.top > innerHeight) {
-        if (M.el.style.transform) { M.el.style.transform = ''; M.x = M.y = 0; }
+      if (!M.g) return;
+      var top = M.g.top - scrollY, r = { width: M.g.w, height: M.g.h };
+      if (top + M.g.h < 0 || top > innerHeight) {
+        if (M.x || M.y) { M.el.style.transform = ''; M.x = M.y = 0; }
         return;
       }
-      var cx = r.left + r.width / 2 - M.x, cy = r.top + r.height / 2 - M.y, tx = 0, ty = 0;
+      if (!ptr.in && Math.abs(M.x) < .05 && Math.abs(M.y) < .05) { if (M.x || M.y) { M.el.style.transform = ''; M.x = M.y = 0; } return; }
+      var cx = M.g.left + M.g.w / 2, cy = top + M.g.h / 2, tx = 0, ty = 0;
       if (ptr.in) {
         var dx = ptr.x - cx, dy = ptr.y - cy, d = Math.sqrt(dx * dx + dy * dy);
         var R = Math.max(r.width, r.height) * .75 + 60;
@@ -1021,11 +1033,12 @@
   });
   function updateGhosts() {
     if (reduce) return;
-    ghosts.forEach(function (G) {
-      var r = G.band.getBoundingClientRect();
-      if (r.bottom < -100 || r.top > innerHeight + 100) return;
-      var m = r.top + r.height / 2 - innerHeight / 2;
-      G.el.style.transform = 'translateY(' + (-m * G.sp).toFixed(1) + 'px)';
+    ghosts.forEach(function (Gh) {
+      if (!Gh.g) return;
+      var top = Gh.g.top - scrollY;
+      if (top + Gh.g.h < -100 || top > innerHeight + 100) return;
+      var m = top + Gh.g.h / 2 - innerHeight / 2;
+      Gh.el.style.transform = 'translateY(' + (-m * Gh.sp).toFixed(1) + 'px)';
     });
   }
   var asts = $$('.ast').map(function (el, i) { return { el: el, o: (i * 47) % 90 }; });
@@ -1099,13 +1112,14 @@
   var pending = [];
   function initFlows() {
     pending = $$('.flow').filter(function (el) { return !el.closest('.hero') && !el.classList.contains('on'); });
+    geoDirty = true;
   }
   function updateFlows() {
     if (!pending.length) return;
     var lim = innerHeight * .94, k = 0;
     pending = pending.filter(function (el) {
-      var r = el.getBoundingClientRect();
-      if (r.top < lim) {
+      if (el._top === undefined) return true;
+      if (el._top - scrollY < lim) {
         el.style.setProperty('--dl', Math.min(k++ * .1, .5).toFixed(2) + 's');
         el.classList.add('on');
         setTimeout(function () { el.classList.add('done'); }, 2400);
@@ -1185,7 +1199,7 @@
   window.addEventListener('resize', function () {
     clearTimeout(resizeT);
     resizeT = setTimeout(function () {
-      fitMega(); measureZones();
+      fitMega(); geoDirty = true;
       if (!introDone && !reduce) { measureBrand(); setBrand(curE); }
     }, 120);
   });
@@ -1566,17 +1580,41 @@
     el.addEventListener('click', function () { sfx('plop'); });
   });
 
-  /* ---------- 6. Laço de animação ---------- */
-  var lastY = -1;
+  /* ---------- 6. Posições guardadas: o laço não mede a página a cada quadro ---------- */
+  var G = { mega: null, collage: null }, geoDirty = true;
+  function measureGeo() {
+    geoDirty = false;
+    var y = window.pageYOffset || 0;
+    function pr(el) { var r = el.getBoundingClientRect(); return { top: r.top + y, left: r.left, w: r.width, h: r.height }; }
+    if (mega) G.mega = pr(mega);
+    if (collage) G.collage = pr(collage);
+    mags.forEach(function (M) { var g = pr(M.el); g.top -= M.y; g.left -= M.x; M.g = g; });
+    ghosts.forEach(function (Gh) { Gh.g = pr(Gh.band); });
+    pending.forEach(function (el) { el._top = el.getBoundingClientRect().top + y; });
+  }
+  setInterval(function () { geoDirty = true; }, 1500);
+  if (window.ResizeObserver) { try { new ResizeObserver(function () { geoDirty = true; }).observe(document.body); } catch (e) {} }
+
+  /* ---------- 7. Laço de animação ---------- */
+  var lastY = -1, fr = 0;
   function tick(now) {
     requestAnimationFrame(tick);
+    fr++;
+    /* leituras primeiro */
     var y = window.pageYOffset || document.documentElement.scrollTop || 0;
     scrollY = y;
-    if (introDone) { updateFlows(); updateLetters(); updateCollage(); updateMags(); }
-    if (y !== lastY) { lastY = y; updateAsts(y); updateGhosts(); }
+    if (geoDirty) measureGeo();
+    readBlob();
+    var moved = y !== lastY;
+    /* depois as escritas */
+    if (introDone) {
+      if (moved || (fr % 10) === 0) updateFlows();
+      updateLetters(); updateCollage(); updateMags();
+    }
+    if (moved) { lastY = y; updateAsts(y); updateGhosts(); }
     updateWaves(now, y);
     updateBlob();
-    if (M.playing && plBar) plBar.style.setProperty('--p', ((M.bar * 16 + M.step) / (BARS * 16) * 100).toFixed(2) + '%');
+    if (M.playing && plBar && !plPanel.hidden && (fr % 6) === 0) plBar.style.setProperty('--p', ((M.bar * 16 + M.step) / (BARS * 16) * 100).toFixed(2) + '%');
   }
 
   fitMega();
@@ -1598,7 +1636,7 @@
     }
     var guard = new Promise(function (res) { setTimeout(res, 2000); });
     Promise.race([Promise.all(wait), guard]).then(go, go);
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { fitMega(); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { fitMega(); geoDirty = true; });
   }
 })();
 </script>
